@@ -4,7 +4,7 @@ A collection of reusable GitHub Actions for building and distributing Rspack nat
 
 ## ⚙️ Configuration
 
-The default values in this toolchain are determined based on [@rspack-contrib/rspack-binding-template](https://github.com/rspack-contrib/rspack-binding-template), including default package.json paths, build commands, and other configurations.
+The default values in this toolchain are determined based on [@rstackjs/rspack-binding-template](https://github.com/rstackjs/rspack-binding-template), including default package.json paths, build commands, and other configurations.
 
 You can also customize the input configurations for each action to adapt to your own rspack custom binding repository. Please refer to the detailed documentation of each action for specific input parameters.
 
@@ -29,12 +29,12 @@ Downloads rspack binding artifacts from GitHub Actions workflow runs. Supports d
 
 ```yaml
 # Download all binding artifacts
-- uses: rspack-contrib/rspack-toolchain/download-rspack-binding@v1
+- uses: rstackjs/rspack-toolchain/download-rspack-binding@v1
   with:
     path: artifacts
 
 # Download specific target binding
-- uses: rspack-contrib/rspack-toolchain/download-rspack-binding@v1
+- uses: rstackjs/rspack-toolchain/download-rspack-binding@v1
   with:
     target: x86_64-apple-darwin
     path: artifacts
@@ -84,7 +84,7 @@ Here are the correct syntax patterns for each package manager:
 With pnpm, you can pass arguments directly to the script:
 
 ```yaml
-- uses: rspack-contrib/rspack-toolchain/get-napi-info@v1
+- uses: rstackjs/rspack-toolchain/get-napi-info@v1
   with:
     napi-build-command: pnpm build
     # Will generate: pnpm build --target x86_64-apple-darwin
@@ -102,7 +102,7 @@ napi-build-command: pnpm build --release
 With npm, you need to use the `--` separator when your script needs additional arguments:
 
 ```yaml
-- uses: rspack-contrib/rspack-toolchain/get-napi-info@v1
+- uses: rstackjs/rspack-toolchain/get-napi-info@v1
   with:
     napi-build-command: npm run build --
     # Will generate: npm run build -- --target x86_64-apple-darwin
@@ -120,7 +120,7 @@ napi-build-command: npm run build -- --release
 With yarn, similar to npm, you need the `--` separator:
 
 ```yaml
-- uses: rspack-contrib/rspack-toolchain/get-napi-info@v1
+- uses: rstackjs/rspack-toolchain/get-napi-info@v1
   with:
     napi-build-command: yarn build --
     # Will generate: yarn build -- --target x86_64-apple-darwin
@@ -173,7 +173,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: napi
-        uses: rspack-contrib/rspack-toolchain/get-napi-info@v1
+        uses: rstackjs/rspack-toolchain/get-napi-info@v1
         with:
           package-json-path: packages/binding/package.json
           napi-build-command: pnpm build
@@ -216,7 +216,7 @@ A reusable workflow that automatically builds native bindings for all platforms 
 jobs:
   build:
     name: Build
-    uses: rspack-contrib/rspack-toolchain/.github/workflows/build.yml@v1
+    uses: rstackjs/rspack-toolchain/.github/workflows/build.yml@v1
     with:
       package-json-path: crates/binding/package.json
       # pnpm example (arguments passed directly)
@@ -255,7 +255,7 @@ The `build` script should execute the `napi build` command, which allows the act
 
 Here's a complete workflow example showing how to use the reusable build workflow with the actions for a release process:
 
-[release.yml](https://github.com/rspack-contrib/rspack-binding-template/blob/main/.github/workflows/release.yml)
+[release.yml](https://github.com/rstackjs/rspack-binding-template/blob/main/.github/workflows/release.yml)
 
 ## 📝 License
 
