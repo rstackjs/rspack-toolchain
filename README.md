@@ -8,6 +8,22 @@ The default values in this toolchain are determined based on [@rstackjs/rspack-b
 
 You can also customize the input configurations for each action to adapt to your own rspack custom binding repository. Please refer to the detailed documentation of each action for specific input parameters.
 
+## 🔒 Security
+
+The reusable workflow and composite actions in this repository pin their transitive GitHub Actions dependencies to full-length commit SHAs.
+
+If the caller repository enables GitHub Actions' "Require actions to be pinned to a full-length commit SHA" policy, pin this toolchain at the call site as well:
+
+```yaml
+jobs:
+  build:
+    uses: rstackjs/rspack-toolchain/.github/workflows/build.yml@<full-length-commit-sha> # v1
+```
+
+Use the full commit SHA for the release you have reviewed. The `# v1` comment keeps the intended release line visible for audits and update tooling.
+
+The examples below keep release tags for readability. In SHA-enforced repositories, replace those tags with reviewed full-length commit SHAs.
+
 ## 📦 Actions
 
 ### 🔽 Download Rspack Binding

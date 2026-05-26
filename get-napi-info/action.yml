@@ -31,7 +31,7 @@ runs:
       shell: bash
     - name: Generate build matrix
       id: generate
-      uses: actions/github-script@v7
+      uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
       with:
         script: |
           const generateMatrix = require('${{ github.action_path }}/generate-matrix.js');
