@@ -23,6 +23,9 @@ env:
   MACOSX_DEPLOYMENT_TARGET: '10.13'
   CARGO_INCREMENTAL: '1'
 
+permissions:
+  contents: read
+
 jobs:
   get-napi-info:
     runs-on: ubuntu-latest
@@ -30,10 +33,19 @@ jobs:
       matrix: ${{ steps.napi-info.outputs.matrix }}
       binding-directory: ${{ steps.napi-info.outputs.binding-directory }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
+      - name: Checkout rspack toolchain
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          repository: ${{ job.workflow_repository }}
+          ref: ${{ job.workflow_sha }}
+          path: .rspack-toolchain
+          persist-credentials: false
       - name: Get NAPI Info
         id: napi-info
-        uses: rstackjs/rspack-toolchain/get-napi-info@v1
+        uses: ./.rspack-toolchain/get-napi-info
         with:
           package-json-path: ${{ inputs.package-json-path }}
           napi-build-command: ${{ inputs.napi-build-command }}
@@ -46,23 +58,25 @@ jobs:
     name: build - ${{ matrix.settings.target }}
     runs-on: ${{ matrix.settings.host }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          persist-credentials: false
       - name: setup pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
       - name: Setup node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
           cache: pnpm
       - name: Setup node x86
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         if: matrix.settings.target == 'i686-pc-windows-msvc'
         with:
           node-version: '22'
           cache: pnpm
           architecture: x86
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@29eef336d9b2848a0b548edc03f92a220660cdb8 # stable
       # Skip installing Rust target when using cross as it manages targets internally
       # See: https://github.com/cross-rs/cross/blob/main/docs/getting-started.md?plain=1#L113
       - name: Install additional Rust target
@@ -70,7 +84,7 @@ jobs:
         run: rustup target add ${{ matrix.settings.target }}
         working-directory: ${{ inputs.working-directory }}
       - name: Cache Rust dependencies
-        uses: Swatinem/rust-cache@v2
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
         with:
           key: ${{ matrix.settings.target }}
           cache-directories: |
@@ -78,12 +92,12 @@ jobs:
             .cargo-cache
       - name: Setup Zig for musl builds
         if: ${{ contains(matrix.settings.target, 'musl') }}
-        uses: goto-bus-stop/setup-zig@v2
+        uses: goto-bus-stop/setup-zig@abea47f85e598557f500fa1fd2ab7464fcb39406 # v2
         with:
           version: 0.13.0
       - name: Install cargo-zigbuild
         if: ${{ contains(matrix.settings.target, 'musl') }}
-        uses: taiki-e/install-action@v2
+        uses: taiki-e/install-action@920ab1831fbf4fb3ef75c8ead83556c918bb7290 # v2
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -100,14 +114,14 @@ jobs:
         shell: bash
       - name: Upload artifact (node files)
         if: ${{ matrix.settings.target != 'wasm32-wasip1-threads' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: bindings-${{ matrix.settings.target }}
           path: '${{ needs.get-napi-info.outputs.binding-directory }}/*.node'
           if-no-files-found: error
       # - name: Upload artifact (wasm files)
       #   if: ${{ matrix.settings.target == 'wasm32-wasip1-threads' }}
-      #   uses: actions/upload-artifact@v4
+      #   uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
       #   with:
       #     name: bindings-${{ matrix.settings.target }}
       #     path: '${{ needs.get-napi-info.outputs.binding-directory }}/*.wasm'
